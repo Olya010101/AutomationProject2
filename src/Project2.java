@@ -1,13 +1,17 @@
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.Assert;
+import static org.testng.Assert.*;
 import java.lang.*;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.Date;
 
 public class Project2 {
 
-//import static org.testng.AssertJUnit.assertTrue;
 
     public static void main(String[] args) throws InterruptedException {
 
@@ -16,74 +20,188 @@ public class Project2 {
 
         WebDriver driver = new ChromeDriver();
         driver.get("http://secure.smartbearsoftware.com/samples/TestComplete12/WebOrders/Login.aspx");
-        Thread.sleep(2000);
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
         driver.findElement(By.id("ctl00_MainContent_username")).sendKeys("Tester");
         driver.findElement(By.name("ctl00$MainContent$password")).sendKeys("test");
         driver.findElement(By.id("ctl00_MainContent_login_button")).click();
-        Thread.sleep(2000);
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
         driver.findElement(By.cssSelector("[href='Process.aspx'")).click();
 
-        driver.findElement(By.name("ctl00$MainContent$fmwOrder$txtQuantity")).sendKeys("" + randomProductQuantity());
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+        int randomQuantity = (int) (Math.random() * 100);
+
+        driver.findElement(By.name("ctl00$MainContent$fmwOrder$txtQuantity")).sendKeys("" + randomQuantity);
         driver.findElement(By.xpath("//input[@value='Calculate']")).click();
 
-        String totalNumber = driver.findElement(By.id("ctl00_MainContent_fmwOrder_txtTotal")).getAttribute("value");
-        //System.out.println(randomProductQuantity());
-        //System.out.println(calculate());
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
-        //Assert.assertEquals(totalNumber, calculate());
+        if (randomQuantity < 10) {
 
-    }
+            String actualTotalNumber = driver.findElement(By.id("ctl00_MainContent_fmwOrder_txtTotal")).getAttribute("value");
+            String expectedTotalNumber = "" + (int) ((randomQuantity * 100));
 
-    public static int randomProductQuantity() {
-        int randomQuantity;
+            assertEquals(actualTotalNumber, expectedTotalNumber);
 
-        randomQuantity = (int)(Math.random()*100);
+        } else if (randomQuantity >= 10) {
 
-        return randomQuantity;
-    }
+            String actualTotalNumber = driver.findElement(By.id("ctl00_MainContent_fmwOrder_txtTotal")).getAttribute("value");
+            String expectedTotalNumber = "" + (int) ((randomQuantity * 100) - (randomQuantity * 100 * 0.08));
 
-    public static String calculate() {
-        int total = randomQuantity * 100;
+            assertEquals(actualTotalNumber, expectedTotalNumber);
 
-        return "" + total;
+        } else {
 
-    }
-
-    public static String randomFirstName() {
-
-        String str = "abcdefghjklmnopqrstuvwxyz";
-        String str2 = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
-        String remaining = "";
-
-                String firstLetter = "" + Math.random();
-
-        for (int i = 0; i < 6; i++) {
-
-            remaining += Math.random();
+            System.out.println("Wrong quantity");
         }
 
-        return firstLetter + remaining;
-    }
+        driver.findElement(By.id("ctl00_MainContent_fmwOrder_txtName")).sendKeys(randomFirstOrLastNameOrCityOrState() + " " + randomFirstOrLastNameOrCityOrState());
+        driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox2")).sendKeys(randomStreetAddress());
+        driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox3")).sendKeys(randomFirstOrLastNameOrCityOrState());
+        driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox4")).sendKeys(randomState());
+        driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox5")).sendKeys(randomZipCode());
+        List <WebElement> radioButtons = driver.findElements(By.cssSelector("input[type='radio']"));
+        int randomNo = (int)(Math.random()* radioButtons.size());
+        radioButtons.get(randomNo).click();
+
+        String Visa = "";
+        String MasterCard = "";
+        String AMEX = "";
+        String cardNum = "0123456789";
+
+        switch (randomNo) {
+
+            case 0:
+
+            for (int i = 0; i < 15; i++) {
+
+                Visa += (int)(Math.random()*cardNum.length());
+
+            }
+
+            driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox6")).sendKeys("4" + Visa);
+            break;
+
+            case 1:
+
+                for (int i = 0; i < 15; i++) {
+
+                    MasterCard += (int)(Math.random()*cardNum.length());
+
+                }
+
+                driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox6")).sendKeys("5" + MasterCard);
+                break;
+
+            case 2:
+
+                for (int i = 0; i < 14; i++) {
+
+                    AMEX += (int)(Math.random()*cardNum.length());
+
+                }
+
+                driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox6")).sendKeys("3" + AMEX);
+                break;
+        }
+        DateFormat dateFormat = new SimpleDateFormat("MM/yy");
+        Date currentDate = new Date();
+
+        System.out.println(currentDate);
+
+        String date = dateFormat.format(currentDate);
 
 
-    public static String randomLastName() {
+        String dateEntered = "" + (int)(1 + Math.random()*11) + "/" + (int)(22 + Math.random()*8);
+        if (dateEntered.length() < 5) {
 
-        String str = "abcdefghjklmnopqrstuvwxyz";
-        String str2 = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
-        String remaining = "";
+            dateEntered = "0" + dateEntered;
+        }
+        if (dateEntered.charAt(4) > date.charAt(4)) {
 
-        String firstLetter = "" + Math.random();
+            driver.findElement(By.id("ctl00_MainContent_fmwOrder_TextBox1")).sendKeys(dateEntered);
 
-        for (int i = 0; i < 6; i++) {
-
-            remaining += Math.random();
         }
 
-        return firstLetter + remaining;
+        else {
+
+            System.out.println(dateEntered);
+            System.out.println(date);
+
+
+        }
+
+        driver.findElement(By.id("ctl00_MainContent_fmwOrder_InsertButton")).click();
+        assertTrue(driver.getPageSource().contains("New order has been successfully added"));
+
+        driver.findElement(By.cssSelector("[href='Default.aspx'")).click();
+
+        //driver.quit();
+
     }
 
 
+    public static String randomFirstOrLastNameOrCityOrState() {
+
+    String str = "abcdefghjklmnopqrstuvwxyz";
+    String str2 = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
+    String remaining = "";
+    String firstLetter = "";
+
+    for (int i = 0; i < 1; i++) {
+
+        int randomIndex = (int)(Math.random()*str2.length());
+
+    firstLetter += str2.charAt(randomIndex);
+
+    for (int j = 0; j < 6; j++)  {
+
+        randomIndex = (int)(Math.random()*str.length());
+
+     remaining += str.charAt(randomIndex);
+    }
+
+    }
+
+    return firstLetter + remaining;
+    }
+
+    public static String randomState() {
+
+        String state = "ABCDEFGHJKLMNOPQRSTUVWXYZ";
+        String str = "";
+
+        for (int i = 0; i < 2; i++) {
+
+            int randomIndex = (int)(Math.random()*state.length());
+
+            str += state.charAt(randomIndex);
+        }
+
+        return str;
+
+    }
+    public static String randomStreetAddress() {
+
+    String number = "" + (int)(100 + Math.random());
+
+    return number + " " + randomFirstOrLastNameOrCityOrState();
+    }
+
+    public static String randomZipCode() {
+
+        String zipCode = "";
+
+        for (int i = 0; i < 5; i++) {
+
+            zipCode += (int) (Math.random()*10);
+
+        }
+
+        return zipCode;
+    }
 
 }
+
+
